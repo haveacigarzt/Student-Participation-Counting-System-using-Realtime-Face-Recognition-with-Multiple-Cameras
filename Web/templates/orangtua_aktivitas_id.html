@@ -1,0 +1,114 @@
+{% extends "boilerplate/base.html" %}
+{% block title %}Orang Tua{% endblock %}
+{% block content %}
+{% include "partials/navbar_orang_tua.html" %}
+   <div class="container text-white">
+      <div class="my-3 pt-1 px-1">
+         {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}   
+               {% for category, message in messages %}
+                  <div class="alert alert-{{category}} mb-3 mx-0 alert-dismissible show fade" role="alert">
+                     <p class="mb-0 text-break">{{ message }}</p>
+                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+               {% endfor %}
+            {% endif %}
+         {% endwith %}
+         <div class="row mx-0">
+            <div class="border rounded py-3 px-lg-4">
+               <h5 class="text-center">Detail Aktivitas 
+                  <a href="/profil/mahasiswa/{{aktivitas[1]['id_mhs']}}"
+                  class="d-block d-lg-inline link-pembuat-jadwal p-0"
+                  onmouseenter="active_link_pembuat_jadwal(event)" onmouseleave="deactive_link_pembuat_jadwal(event)">
+                     <img src="/{{pp_path}}" style="border-radius: 50%; object-fit:cover; width:30px; height:30px; margin-right: 2px;" alt=""> 
+                     <span>
+                        {{aktivitas[1]['nama_mhs']}}
+                     </span>
+                  </a>
+               </h5>
+               <h5 class="text-center">{{keterangan[0]}}</h5>
+               <h6 class="text-center mb-3">pada {{keterangan[1]}}</h6>
+               <div class="d-flex p-2 border mb-2 mb-lg-4 rounded row mx-0">
+                  {% if aktivitas[1]["kegiatan"] != "-" %}
+                  <div class="col-lg-6 px-0 px-lg-2 mb-4 mb-lg-0">
+                     <h6 class="text-center mb-3"><span class="title-jadwal-kegiatan" id="title_jadwal_kegiatan">Jadwal Kegiatan</span></h6>
+                     <div class="row mx-0 mx-lg-2 pe-1 pe-lg-0">
+                        <div class="col-5 col-lg-4 form-div-top-left">Kegiatan</div>
+                        <div class="col-7 col-lg-8 form-div-top-right" style="overflow-wrap: break-word;">{{aktivitas[1]["kegiatan"]}}</div>
+                        <div class="col-5 col-lg-4 form-div-mid-left">Ruangan</div>
+                        <div class="col-7 col-lg-8 form-div-mid-right">{{aktivitas[1]["ruangan"]}}</div>
+                        <div class="col-5 col-lg-4 form-div-mid-left">Waktu Mulai</div>
+                        <div class="col-7 col-lg-8 form-div-mid-right">{{aktivitas[1]["mulai"]}} WIB</div>
+                        <div class="col-5 col-lg-4 form-div-mid-left">Waktu Selesai</div>
+                        <div class="col-7 col-lg-8 form-div-mid-right">{{aktivitas[1]["selesai"]}} WIB</div>
+                        <div class="col-5 col-lg-4 form-div-mid-left">Durasi Kegiatan</div>
+                        <div class="col-7 col-lg-8 form-div-mid-right">{{aktivitas[1]["durasi"]}} <span title="J: Jam, M: Menit, D: Detik">(J:MM:DD)</span></div>
+                        <div class="col-5 col-lg-4 form-div-mid-left">Keterangan</div>
+                        <div class="col-7 col-lg-8 form-div-mid-right" style="overflow-wrap: break-word;">{{aktivitas[1]["keterangan"]}}</div>
+                        <div class="col-5 col-lg-4 form-div-mid-left">Pembuat Jadwal</div>
+                        <div class="col-7 col-lg-8 form-div-mid-right">
+                           {% if aktivitas[1]["nama_dosen"] == "-" %}
+                              {{aktivitas[1]["nama_dosen"]}}
+                           {% else %}
+                              <a href="/profil/dosen/{{aktivitas[1]['id_dosen']}}" class="link-pembuat-jadwal" onmouseenter="active_link_pembuat_jadwal(event)" onmouseleave="deactive_link_pembuat_jadwal(event)">
+                                 <img src="/{{aktivitas[1]['foto_profil']}}" style="border-radius: 50%; object-fit:cover; width:30px; height:30px; margin-right: 2px;" alt="">
+                                 <span>
+                                    {{aktivitas[1]["nama_dosen"]}}
+                                 </span>
+                              </a>
+                           {% endif %}
+                        </div>
+                     </div>
+                  </div>
+                  <div class="col-lg-6 px-0 px-lg-2">
+                     <h6 class="text-center mb-2 mb-lg-3"><span class="title-jadwal-kegiatan" id="title_jadwal_kegiatan">Durasi aktivitas: {{ aktivitas[0]["total"] }} ({{ aktivitas[0]["waktu"]|length }} kali teridentifikasi)</span></h6>
+                     <div class="px-3">
+                        <table class="table text-center" id="table_aktivitas">
+                           <thead>
+                              <tr>
+                                 <th>Waktu Teridentifikasi<br>(JJ:MM:DD)</th>
+                                 <th>Wajah Terekam</th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              {% for el in aktivitas[0]["waktu"] %}
+                                 <tr>
+                                    <td>{{el[0]}}</td>
+                                    <td><img width="60" src="/static/pictures/identified/{{el[1]}}" alt=""></td>
+                                 </tr>
+                              {% endfor %}
+                           </tbody>
+                        </table>
+                     </div>
+                  </div>
+                  {% else %}
+                  <div class="col-lg-6 px-0 px-lg-2 mx-auto">
+                     <h6 class="text-center mb-2 mb-lg-3"><span class="title-jadwal-kegiatan">Durasi aktivitas: {{ aktivitas[0]["total"] }} ({{ aktivitas[0]["waktu"]|length }} kali teridentifikasi)</span></h6>
+                     <div class="px-3">
+                        <table class="table text-center" id="table_aktivitas">
+                           <thead>
+                              <tr>
+                                 <th>Waktu Teridentifikasi<br><span title="J: Jam, M: Menit, D: Detik">(JJ:MM:DD)</span></th>
+                                 <th>Wajah Terekam</th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              {% for el in aktivitas[0]["waktu"] %}
+                                 <tr>
+                                    <td>{{el[0]}}</td>
+                                    <td><img width="60" src="/static/pictures/identified/{{el[1]}}" alt=""></td>
+                                 </tr>
+                              {% endfor %}
+                           </tbody>
+                        </table>
+                     </div>
+                  </div>
+                  {% endif %}
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <script>
+   </script>
+{% endblock content %}

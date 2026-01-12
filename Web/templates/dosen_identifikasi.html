@@ -1,0 +1,43 @@
+{% extends "boilerplate/base.html" %}
+{% block title %}Dosen{% endblock %}
+{% block content %}
+{% include "partials/navbar_dosen.html" %}
+   <div class="container text-white my-3 pt-1">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+         {% if messages %}   
+            {% for category, message in messages %}
+               <div class="alert alert-{{category}} mb-3 mx-0 alert-dismissible show fade" role="alert">
+                  <p class="mb-0 text-break">{{ message }}</p>
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+               </div>
+            {% endfor %}
+         {% endif %}
+      {% endwith %}
+      <div class="row mx-0 border border-1 border-white rounded">
+         <div class="pt-3 text-center">
+            <h4 class="text-center">Identifikasi yang Sedang Berjalan</h4>
+         </div>
+         <div class="p-4 pt-0">
+            <div class="row mx-0 mt-3 border border-1 border-white rounded p-2 p-lg-3 p-md-0">
+               <div class="row m-0 equal-row px-0 px-lg-2" id="jadwal_card_container">
+               {% if ruangan %}
+                  {% for el in ruangan %}
+                     <div class="col-12 col-md-6 col-lg-4 col-xl-3 p-3">
+                        <div class="card-jadwal align-self-stretch bg-light rounded  border-red"><a href="/dosen/identifikasi/{{el['_id']}}" class="d-block p-3 text-black text-decoration-none">
+                           <p class="mb-05">Ruangan: {{el["nama_ruangan"]}} ({{el["kode_ruangan"]}})</p>
+                           <p class="mb-05">Komputer: {{el["nama_komputer"]}}</p>
+                           <p class="mb-05">Kamera: {{el["kamera"]}}</p>
+                        </a></div>
+                     </div>
+                  {% endfor %}
+               {% else %}
+                  <div class="d-flex justify-content-center">
+                     <i>Tidak ada proses identifikasi yang sedang berjalan saat ini</i>
+                  </div>
+               {% endif %}
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+{% endblock content %}

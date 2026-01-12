@@ -1,0 +1,343 @@
+{% extends "boilerplate/base.html" %}
+{% block title %}Akun{% endblock %}
+{% block content %}
+{% if user[0] == "mahasiswa" %}
+{% include "partials/navbar_mahasiswa.html" %}
+{% elif user[0] == "dosen" %}
+{% include "partials/navbar_dosen.html" %}
+{% else %}
+{% include "partials/navbar_orang_tua.html" %}
+{% endif %}
+   <div class="container text-white">
+      <div class="my-4">
+         <div class="row">
+            <div class="col-lg-6 mx-auto">
+               {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}   
+                     {% for category, message in messages %}
+                        <div class="alert alert-{{category}} mb-3 mx-2 alert-dismissible show fade" role="alert">
+                           <p class="mb-0 text-break">{{ message }}</p>
+                           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                     {% endfor %}
+                  {% endif %}
+               {% endwith %}
+               <h4 class="text-center">Akun</h4>
+               <div class="row border border-1 rounded border-white p-2 pt-3 pe-3 p-lg-4 align-items-center mx-2" id="form_div">
+                  <div class="col-11 px-0 px-lg-2">
+                     <div class="row m-0">
+                        {% if user[0] == "mahasiswa" %}
+                        <div class="col-4">
+                           <p>Nama</p>
+                        </div>
+                        <div class="col-1 px-0 align-self-center">
+                           <p class="text-end">:</p>
+                        </div>
+                        <div class="col-7 align-self-center">
+                           <p>{{user_1["nama"]}}</p>
+                        </div>
+                        <div class="col-4">
+                           <p>Jenis Pengguna</p>
+                        </div>
+                        <div class="col-1 px-0 align-self-center">
+                           <p class="text-end">:</p>
+                        </div>
+                        <div class="col-7 align-self-center">
+                           <p>{{user_1["pengguna"]}}</p>
+                        </div>
+                        <div class="col-4">
+                           <p>Username</p>
+                        </div>
+                        <div class="col-1 px-0 align-self-center">
+                           <p class="text-end">:</p>
+                        </div>
+                        <div class="col-7 align-self-center">
+                           <p>{{user_1["username"]}}</p>
+                        </div>
+                        <div class="col-4">
+                           <p>Email</p>
+                        </div>
+                        <div class="col-1 px-0 align-self-center">
+                           <p class="text-end">:</p>
+                        </div>
+                        <div class="col-7 align-self-center">
+                           <p>{{user_1["email"]}}</p>
+                        </div>
+                        <div class="col-4">
+                           <p>NIM</p>
+                        </div>
+                        <div class="col-1 px-0 align-self-center">
+                           <p class="text-end">:</p>
+                        </div>
+                        <div class="col-7 align-self-center">
+                           <p>{{user_1["nim"]}}</p>
+                        </div>
+                        <div class="col-4">
+                           <p>Akun Orang Tua
+                              {% if user_1["req_orang_tua"] %}
+                                 <i class="fas fa-triangle-exclamation mt-1 ms-2 text-warning" title="Harap melakukan konfirmasi akun orang tua"></i>
+                              {% endif %}
+                           </p>
+                        </div>
+                        <div class="col-1 px-0 align-self-center">
+                           <p class="text-end">:</p>
+                        </div>
+                        <div class="col-7 align-self-center">
+                           {% if user_1["orang_tua"] %}
+                              <p>
+                                 <a href="/profil/orangtua/{{user_1['id_orang_tua']}}">
+                                    {{user_1["orang_tua"]}}
+                                 </a>
+                              </p>
+                           {% else %}
+                              {% if user_1["req_orang_tua"] %}
+                                 <p>- (<i>Menunggu konfirmasi</i>)</p>
+                              {% else %}
+                                 <p>-</p>
+                              {% endif %}
+                           {% endif %}
+                        </div>
+                        <div class="col-4 align-self-center">
+                           <p>Foto Profil</p>
+                        </div>
+                        <div class="col-1 px-0 align-self-center">
+                           <p class="text-end">:</p>
+                        </div>
+                        <div class="col-7 align-self-center">
+                           <div class="row">
+                              <div class="col-7 col-lg-5">
+                                 <img src="/{{user_1['foto_profil']}}" alt="" class="w-100 mb-2 cursor-pointer" srcset="" data-bs-toggle="modal" data-bs-target="#modal_profile_pic">
+                              </div>
+                           </div>
+                        </div>
+                        <div class="col-4 d-flex">
+                           <p>Foto Wajah</p>
+                           {% if not user_1['foto'][0] %}
+                              <i class="fas fa-triangle-exclamation mt-1 ms-2 text-warning" title="Harap menambahkan foto wajah"></i>
+                           {% endif %}
+                        </div>
+                        <div class="col-1 px-0 align-self-center">
+                           <p class="text-end">:</p>
+                        </div>
+                        <div class="col-7 align-self-center">
+                           {% if not user_1['foto'][0] %}
+                              <p>-</p>
+                           {% endif %}
+                        </div>
+                        <div class="row">
+                           {% for el in user_1['foto'] %}
+                              <div class="col-4 col-lg-3">
+                                 <img src="/{{el}}" style="aspect-ratio: 1/1;" alt="" class="w-100 mb-2" srcset="">
+                                 <div class="mb-3">
+                                    <button title="Hapus foto" data-bs-toggle="modal" data-bs-target="#delete_wajah_{{loop.index0}}" class="d-block mx-auto btn btn-danger"><i class="fas fa-trash"></i></button>
+                                 </div>
+                              </div>
+                              <div class="modal fade" id="delete_wajah_{{loop.index0}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                 <div class="modal-dialog modal-md mx-auto my-4">
+                                    <div class="modal-content px-3 py-2 mx-auto">
+                                       <div class="modal-body">
+                                          <h5 class="mb-4 mt-2 pb-1 border-1 border-bottom border-black">Konfirmasi hapus</h5>
+                                          <div>
+                                             <img style="aspect-ratio: 1/1;" src="/{{el}}" alt="" class="w-100 mb-2" srcset="">
+                                             <p class="text-center">Hapus data wajah ini?</p>
+                                          </div>
+                                          <form action="{{url_for('hapus_foto_wajah')}}" method="post" class="mt-2">
+                                             <input name="file_path" type="hidden" value="{{el}}">
+                                             <input name="index" type="hidden" value="{{loop.index0}}">
+                                             <div class="d-flex justify-content-evenly mt-4">
+                                                <button type="button" class="btn  btn-secondary px-2 py-1 shadow-sm h5 mb-0" data-bs-dismiss="modal">Batal</button>
+                                                <button type="submit" class="btn btn-success btn-card px-3 py-1 shadow-sm h5 mb-0">Ya</button>
+                                             </div>
+                                          </form>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           {% endfor %}
+                        </div>
+                        {% elif user[0] == "dosen" %}
+                           <div class="col-4">
+                              <p>Nama</p>
+                           </div>
+                           <div class="col-1 px-0 align-self-center">
+                              <p class="text-end">:</p>
+                           </div>
+                           <div class="col-7 align-self-center">
+                              <p>{{user_1["nama"]}}</p>
+                           </div>
+                           <div class="col-4">
+                              <p>Jenis Pengguna</p>
+                           </div>
+                           <div class="col-1 px-0 align-self-center">
+                              <p class="text-end">:</p>
+                           </div>
+                           <div class="col-7 align-self-center">
+                              <p>{{user_1["pengguna"]}}</p>
+                           </div>
+                           <div class="col-4">
+                              <p>Username</p>
+                           </div>
+                           <div class="col-1 px-0 align-self-center">
+                              <p class="text-end">:</p>
+                           </div>
+                           <div class="col-7 align-self-center">
+                              <p>{{user_1["username"]}}</p>
+                           </div>
+                           <div class="col-4">
+                              <p>Email</p>
+                           </div>
+                           <div class="col-1 px-0 align-self-center">
+                              <p class="text-end">:</p>
+                           </div>
+                           <div class="col-7 align-self-center">
+                              <p>{{user_1["email"]}}</p>
+                           </div>
+                           <div class="col-4">
+                              <p>NIP</p>
+                           </div>
+                           <div class="col-1 px-0 align-self-center">
+                              <p class="text-end">:</p>
+                           </div>
+                           <div class="col-7 align-self-center">
+                              <p>{{user_1["nip"]}}</p>
+                           </div>
+                           <div class="col-4 align-self-center">
+                              <p>Foto Profil</p>
+                           </div>
+                           <div class="col-1 px-0 align-self-center">
+                              <p class="text-end">:</p>
+                           </div>
+                           <div class="col-7 align-self-center">
+                              <div class="row">
+                                 <div class="col-7 col-lg-5">
+                                    <img src="/{{user_1['foto_profil']}}" alt="" class="w-100 mb-2 cursor-pointer" srcset="" data-bs-toggle="modal" data-bs-target="#modal_profile_pic">
+                                 </div>
+                              </div>
+                           </div>
+                        {% elif user[0] == "orang_tua" %}
+                           <div class="col-4">
+                              <p>Nama</p>
+                           </div>
+                           <div class="col-1 px-0 align-self-center">
+                              <p class="text-end">:</p>
+                           </div>
+                           <div class="col-7 align-self-center">
+                              <p>{{user_1["nama"]}}</p>
+                           </div>
+                           <div class="col-4">
+                              <p>Jenis Pengguna</p>
+                           </div>
+                           <div class="col-1 px-0 align-self-center">
+                              <p class="text-end">:</p>
+                           </div>
+                           <div class="col-7 align-self-center">
+                              <p>{{user_1["pengguna"]}}</p>
+                           </div>
+                           <div class="col-4">
+                              <p>Username</p>
+                           </div>
+                           <div class="col-1 px-0 align-self-center">
+                              <p class="text-end">:</p>
+                           </div>
+                           <div class="col-7 align-self-center">
+                              <p>{{user_1["username"]}}</p>
+                           </div>
+                           <div class="col-4">
+                              <p>Email</p>
+                           </div>
+                           <div class="col-1 px-0 align-self-center">
+                              <p class="text-end">:</p>
+                           </div>
+                           <div class="col-7 align-self-center">
+                              <p>{{user_1["email"]}}</p>
+                           </div>
+                           <div class="col-4">
+                              <p>Akun Anak
+                                 {% if user_1["anak"] == "-" %}
+                                    <i class="fas fa-triangle-exclamation mt-1 ms-2 text-warning" title="Harap memilih akun anak"></i>
+                                 {% endif %}
+                              </p>
+                           </div>
+                           <div class="col-1 px-0 align-self-center">
+                              <p class="text-end">:</p>
+                           </div>
+                           <div class="col-7 align-self-center">
+                              <p>
+                                 {% if user_1["anak"] == "-" %}
+                                    {% if user_1["req_anak"] == "" %}
+                                       -
+                                    {% else %}
+                                       <i>Menunggu konfirmasi oleh <a href="/profil/mahasiswa/{{user_1['req_id_anak']}}">{{user_1["req_anak"]}}</a></i>
+                                    {% endif %}
+                                 {% else %}
+                                    <a href="/profil/mahasiswa/{{user_1['id_anak']}}">
+                                       {{user_1["anak"]}}
+                                    </a>
+                                 {% endif %}
+                              </p>
+                           </div>
+                           <div class="col-4 align-self-center">
+                              <p>Foto Profil</p>
+                           </div>
+                           <div class="col-1 px-0 align-self-center">
+                              <p class="text-end">:</p>
+                           </div>
+                           <div class="col-7 align-self-center">
+                              <div class="row">
+                                 <div class="col-7 col-lg-5">
+                                    <img src="/{{user_1['foto_profil']}}" alt="" class="w-100 mb-2 cursor-pointer" srcset="" data-bs-toggle="modal" data-bs-target="#modal_profile_pic">
+                                 </div>
+                              </div>
+                           </div>
+                        {% endif %}
+                     </div>
+                  </div>
+                  <button class="btn btn-warning shadow col-1 align-self-start p-2" id="button_edit" title="Ubah data" onclick="gantiInput2({{user_1}}, `{{url}}`, `{{user[0]}}`, `{{url_for('hapus_foto_wajah')}}`)"><i class="fa-solid fa-pen-to-square"></i></button>
+                  <div class="modal fade" id="modal_profile_pic" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                     <div class="modal-dialog modal-dialog-konfirmasi mx-auto my-4">
+                        <div class="modal-content p-2 mx-auto">
+                           <div class="modal-body d-flex flex-column">
+                              <img src="/{{user_1['foto_profil']}}">
+                              <button type="button" class="btn btn-secondary px-2 py-1 shadow-sm h5 mb-0 mx-auto mt-2" data-bs-dismiss="modal">Tutup</button>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="modal fade" id="modalKonfirmasiAkunOrtu" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+         <div class="modal-dialog modal-dialog-konfirmasi mx-auto my-4">
+            <div class="modal-content px-3 py-2 mx-auto">
+               <div class="modal-body">
+                  <h5 class="mb-4 mt-2 pb-1 border-1 border-bottom border-black">Konfirmasi Penerimaan Akun Orang Tua</h5>
+                  <form action="#" method="post" class="mt-2" onsubmit="return submitFormAkun(event)">
+                     <p class="text-center" id="text_modalKonfirmasiAkunOrtu"></p>
+                     <div class="d-flex justify-content-evenly mt-4">
+                        <button type="button" class="btn  btn-secondary px-2 py-1 shadow-sm h5 mb-0" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-success btn-card px-2 py-1 shadow-sm h5 mb-0" data-bs-dismiss="modal">Yakin</button>
+                     </div>
+                  </form>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="modal fade" id="modalKonfirmasiAkunAnak" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+         <div class="modal-dialog modal-dialog-konfirmasi mx-auto my-4">
+            <div class="modal-content px-3 py-2 mx-auto">
+               <div class="modal-body">
+                  <h5 class="mb-4 mt-2 pb-1 border-1 border-bottom border-black">Konfirmasi Pengajuan Akun Anak</h5>
+                  <form action="#" method="post" class="mt-2" onsubmit="return submitFormAkun2(event)">
+                     <p class="text-center" id="text_modalKonfirmasiAkunAnak"></p>
+                     <div class="d-flex justify-content-evenly mt-4">
+                        <button type="button" class="btn  btn-secondary px-2 py-1 shadow-sm h5 mb-0" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-success btn-card px-2 py-1 shadow-sm h5 mb-0" data-bs-dismiss="modal">Yakin</button>
+                     </div>
+                  </form>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+{% endblock content %}

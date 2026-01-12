@@ -1,0 +1,24 @@
+{% extends "boilerplate/base.html" %}
+{% block title %}Orang Tua{% endblock %}
+{% block content %}
+{% include "partials/navbar_orang_tua.html" %}
+   <div class="container px-1 text-white pb-2">
+      <div class="my-3 my-md-4 pt-1">
+         {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}   
+               {% for category, message in messages %}
+                  <div class="alert alert-{{category}} mb-3 alert-dismissible show fade" role="alert">
+                     <p class="mb-0 text-break">{{ message }}</p>
+                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+               {% endfor %}
+            {% endif %}
+         {% endwith %}
+         <div class="row mx-0 text-center">
+            <div class="alert alert-warning">
+               <i><a href="/profil/mahasiswa/{{req_id_anak}}">{{req_nama_anak}}</a> belum mengonfirmasi pengajuan akun anak yang anda kirimkan. Harap menghubungi mahasiswa tersebut untuk melakukan konfirmasi.</i>
+            </div>
+         </div>
+      </div>
+   </div>
+{% endblock content %}

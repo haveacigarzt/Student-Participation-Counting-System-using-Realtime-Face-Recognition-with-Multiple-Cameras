@@ -1,0 +1,73 @@
+{% extends "boilerplate/base.html" %}
+{% block title %}Dosen{% endblock %}
+{% block content %}
+{% include "partials/navbar_dosen.html" %}
+   <div class="container text-white">
+      <div class="row mx-0 my-3 pt-1">
+         {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}   
+               {% for category, message in messages %}
+                  <div class="alert alert-{{category}} mb-3 mx-0 alert-dismissible show fade" role="alert">
+                     <p class="mb-0 text-break">{{ message }}</p>
+                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+               {% endfor %}
+            {% endif %}
+         {% endwith %}
+         <div class="col-6 p-1 pt-3 non-active-display text-center">
+            <a href="{{url_for('dosen')}}" class="display-link display-link-unactive d-block">Jadwal Kegiatan</a>
+         </div>
+         <div class="col-6 p-1 pt-3 active-display text-center">
+            <a class="display-link">Berada di Kampus</a>
+         </div>
+         <div class="display-inside half-a-border-on-top p-3 p-lg-4">
+            <div class="d-flex justify-content-between">
+               <div class="row w-100 m-0 align-items-center mb-3">
+                  <div class="col-lg-2"></div>
+                  <div class="col-lg-4 bdk-left text-lg-end text-center">
+                     <h4 class="mb-lg-0" id="that_day_element">{{hari_tgl[0]}}</h4>
+                  </div>
+                  <div class="col-lg-4 bdk-right border-lg-start">
+                     <form action="{{url_for('dosen_berada_di_kampus')}}" method="get" class="d-flex mb-0" onsubmit="change_url(event)">
+                        <input class="form-control" type="date" name="tanggal" value="{{hari_tgl[1]}}" id="date_control">
+                        <button type="sumbit" class="btn btn-sm btn-success ms-3">Ganti</button>
+                     </form>
+                  </div>
+                  <div class="col-lg-2"></div>
+               </div>
+            </div>
+            <div class="overflow-x-auto">
+               <table id="table_berada_di_kampus" class="table table-bordered display nowrap p-3 rounded bg-white shadow-sm border w-100">
+                  <thead>
+                     <tr>
+                        <th scope="col">No.</th>
+                        <th scope="col">Nama</th>
+                        <th scope="col">NIM</th>
+                        <th scope="col">Tempat Teridentifikasi<br>(Ruangan)</th>
+                        <th scope="col">Waktu Terakhir<br>(JJ:MM:DD)</th>
+                        <th scope="col">Durasi Aktivitas<br>(J:MM:DD)</th>
+                     </tr>
+                  </thead>
+                  <tbody id="table_berada_di_kampus_tbody">
+                     {% for el in aktivitas %}
+                        <tr class="link-profile-table" onmouseover="bdk_in(event)" onmouseout="bdk_out(event)" onclick="bdk_out(event)" data-url="/dosen/mahasiswa/aktivitas/{{el['_id']}}">
+                           <td class="mypt"></td>
+                           <td>
+                              <img src="/{{el['foto_profil_path']}}" width="35" style="border-radius: 50%; object-fit:cover; width:30px; height:30px; margin-right: 2px;" alt="">
+                              {{el["nama_mahasiswa"]}}
+                           </td>
+                           <td class="mypt">{{el["nim"]}}</td>
+                           <td class="mypt td_ruangan_bdk">{{el["ruangan"]}}</td>
+                           <td class="mypt">{{el["waktu_terakhir"]}}</td>
+                           <td class="mypt">{{el["durasi"]}}</td>
+                        </tr>
+                     {% endfor %}
+                  </tbody>
+               </table>
+            </div>
+         </div>
+      </div>
+   </div>
+<script type="text/javascript">
+</script>
+{% endblock content %}

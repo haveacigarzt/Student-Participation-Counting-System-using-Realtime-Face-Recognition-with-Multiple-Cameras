@@ -1,0 +1,243 @@
+{% extends "boilerplate/base.html" %}
+{% block title %}Identifikasi{% endblock %}
+{% block content %}
+{% if user[0] == "mahasiswa" %}
+{% include "partials/navbar_mahasiswa.html" %}
+{% elif user[0] == "dosen" %}
+{% include "partials/navbar_dosen.html" %}
+{% else %}
+{% include "partials/navbar_orang_tua.html" %}
+{% endif %}
+   <div class="container text-white">
+      <div class="my-4">
+         <div class="row">
+            <div class="col-lg-6 mx-auto">
+               {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}   
+                     {% for category, message in messages %}
+                        <div class="alert alert-{{category}} mb-3 mx-2 alert-dismissible show fade" role="alert">
+                           <p class="mb-0 text-break">{{ message }}</p>
+                           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                     {% endfor %}
+                  {% endif %}
+               {% endwith %}
+            </div>
+            {% if not frame["frame"] %}
+               <p class="text-center" id="msg_identifikasi">
+                  <i>Proses identifikasi ini tidak ditemukan/telah selesai.</i>
+               </p>
+               <div class="row m-0 d-none" id="row_identifikasi">
+                  <div class="col-lg-8">
+                     <p class="mb-1">Ruangan: {{ruangan["nama_ruangan"]}} ({{ruangan["kode_ruangan"]}})</p>
+                     <p>Device: {{frame["nama_komputer"]}} ({{frame["kamera"]}})</p>
+                     {% if frame["nama_kegiatan"] %}
+                        <p id="kegiatan_saat_ini">Kegiatan Saat Ini: <a href='/dosen/jadwal/{{frame["jadwal_id"]}}'>{{frame["nama_kegiatan"]}}</a></p>
+                     {% else %}
+                        <p id="kegiatan_saat_ini">Kegiatan Saat Ini: -</p>
+                     {% endif %}
+                     <canvas id="myCanvas" class="w-100"></canvas>
+                  </div>
+                  <div class="col-lg-4 mt-3 mt-lg-0">
+                     <p id="teridentifikasi">Teridentifikasi ({{frame["status"]}}):</p>
+                     <div id="frame" class="row" data-frame="{{ frame }}">
+                     </div>
+                  </div>
+               </div>
+            {% else %}
+               <p class="text-center d-none" id="msg_identifikasi">
+                  <i>Proses identifikasi ini tidak ditemukan/telah selesai.</i>
+               </p>
+               <div class="row m-0" id="row_identifikasi">
+                  <div class="col-lg-8">
+                     <p class="mb-1">Ruangan: {{ruangan["nama_ruangan"]}} ({{ruangan["kode_ruangan"]}})</p>
+                     <p>Device: {{frame["nama_komputer"]}} ({{frame["kamera"]}})</p>
+                     {% if frame["nama_kegiatan"] %}
+                        <p id="kegiatan_saat_ini">Kegiatan Saat Ini: <a href='/dosen/jadwal/{{frame["jadwal_id"]}}'>{{frame["nama_kegiatan"]}}</a></p>
+                     {% else %}
+                        <p id="kegiatan_saat_ini">Kegiatan Saat Ini: -</p>
+                     {% endif %}
+                     <canvas id="myCanvas" class="w-100"></canvas>
+                  </div>
+                  <div class="col-lg-4 mt-3 mt-lg-0">
+                     <p id="teridentifikasi">Teridentifikasi ({{frame["status"]}}):</p>
+                     <div id="frame" class="row" data-frame="{{ frame }}">
+                     </div>
+                  </div>
+               </div>
+            {% endif %}
+         </div>
+      </div>
+   </div>
+   <script>
+      // self executing function here
+      (function() {
+         const canvas = document.getElementById("myCanvas");
+         const ctx = canvas.getContext("2d");
+
+         const msg_identifikasi = document.getElementById("msg_identifikasi")
+         const row_identifikasi = document.getElementById("row_identifikasi")
+
+         const teridentifikasi = document.getElementById("teridentifikasi")
+
+         const kegiatan_saat_ini = document.getElementById("kegiatan_saat_ini")
+         
+         const img = document.getElementById('frame')
+         let frame = img.dataset.frame;
+         frame = frame.replace(/'/g, '"');
+         let json = JSON.parse(frame);
+         const image = new Image();
+         image.src = "data:image/jpeg;base64, " + json["frame"];
+
+         console.log(typeof(json["frame"]))
+         console.log(json["frame"])
+         
+         // image.src = "your-image.jpg"; // Replace with your image path or URL
+
+         image.onload = function () {
+            // Resize canvas to match image
+            canvas.width = image.width;
+            canvas.height = image.height;
+
+            // Draw image
+            ctx.drawImage(image, 0, 0);
+
+            // Draw a red rectangle
+            const zipped = json["locations"].map((loc, i) => [loc, json["distances"][i]]);
+            
+            for (let [faceLocation, distance] of zipped) {
+               const [top, right, bottom, left] = faceLocation; // from dlib
+               
+               const x = left;
+               const y = top;
+               const width = right - left;
+               const height = bottom - top;
+               
+               distance = parseFloat(distance)
+
+               ctx.strokeStyle = distance == 0.0 ? "rgb(180, 180, 180)" : distance > json["threshold"] ? "rgb(0, 120, 255)" : "rgb(0, 255, 0)";
+               ctx.lineWidth = 3;
+               ctx.strokeRect(x, y, width, height);
+
+               // Draw some text
+               ctx.font = "15px Arial";
+
+               // Measure text size
+               const metrics = ctx.measureText(distance);
+               const textWidth = metrics.width;
+               const textHeight = 18; // Approximate height (canvas doesn't give height directly)
+
+               
+               
+               // Draw background rectangle
+               ctx.fillStyle = "white"
+               ctx.fillRect(x - 1, y - 7 - textHeight + 5, textWidth + 4, textHeight);
+
+               // Draw text on top
+               ctx.fillStyle = "black";
+               ctx.fillText(distance, x, y - 5);
+            }
+
+            let html = ``
+            for(let names of json["face_names"]){
+               const [id_file, name] = names.split("&")
+               html += `
+                  <div class="col-3 mb-2 text-center">
+                     <img src="/static/pictures/identified/${id_file}.jpg" style="aspect-ratio: 1/1;" alt="" class="w-100 mb-2" srcset="">
+                     <small>${name}</small>
+                  </div>
+               `
+            }
+            img.innerHTML = html
+         };
+         
+         function fetchFrame() {
+            fetch(`/frame/${json["_id"]}`)
+               .then(response => {
+                  if (!response.ok) throw new Error("Failed to load frame")
+                  return response.json()
+               })
+               .then(data => {
+                  if(!data["frame"]){
+                     msg_identifikasi.classList.remove("d-none")
+                     row_identifikasi.classList.add("d-none")
+                     clearInterval(intervalId);
+                  } else {
+                     msg_identifikasi.classList.add("d-none")
+                     row_identifikasi.classList.remove("d-none")
+                     teridentifikasi.innerText = `Teridentifikasi (${data["status"]}):`
+
+                     const image = new Image();
+                     image.src = "data:image/jpeg;base64, " + data["frame"];
+   
+                     image.onload = function () {
+                        // Resize canvas to match image
+                        canvas.width = image.width;
+                        canvas.height = image.height;
+   
+                        // Draw image
+                        ctx.drawImage(image, 0, 0);
+   
+                        // Draw a red rectangle
+                        const zipped = data["locations"].map((loc, i) => [loc, data["distances"][i]]);
+                        
+                        for (let [faceLocation, distance] of zipped) {
+                           const [top, right, bottom, left] = faceLocation; // from dlib
+                           
+                           const x = left;
+                           const y = top;
+                           const width = right - left;
+                           const height = bottom - top;
+                           
+                           distance = parseFloat(distance)
+   
+                           ctx.strokeStyle = distance == 0.0 ? "rgb(180, 180, 180)" : distance > data["threshold"] ? "rgb(0, 120, 255)" : "rgb(0, 255, 0)";
+                           ctx.lineWidth = 3;
+                           ctx.strokeRect(x, y, width, height);
+   
+                           // Draw some text
+                           ctx.font = "15px Arial";
+   
+                           // Measure text size
+                           const metrics = ctx.measureText(distance);
+                           const textWidth = metrics.width;
+                           const textHeight = 18; // Approximate height (canvas doesn't give height directly)
+   
+                           
+                           
+                           // Draw background rectangle
+                           ctx.fillStyle = "white"
+                           ctx.fillRect(x - 1, y - 7 - textHeight + 5, textWidth + 4, textHeight);
+   
+                           // Draw text on top
+                           ctx.fillStyle = "black";
+                           ctx.fillText(distance, x, y - 5);
+                        }
+                        let html = ``
+                        for(let names of data["face_names"]){
+                           const [id_file, name] = names.split("&")
+                           html += `
+                              <div class="col-3 mb-2 text-center">
+                                 <img src="/static/pictures/identified/${id_file}.jpg" style="aspect-ratio: 1/1;" alt="" class="w-100 mb-2" srcset="">
+                                 <small>${name}</small>
+                              </div>
+                           `
+                        }
+                        if(data["nama_kegiatan"]){
+                           kegiatan_saat_ini.innerHTML = `Kegiatan Saat Ini: <a href='/dosen/jadwal/${data["jadwal_id"]}'>${data["nama_kegiatan"]}</a>`
+                        } else {
+                           kegiatan_saat_ini.innerHTML = `Kegiatan Saat Ini: -`
+                        }
+                        img.innerHTML = html
+                     };
+                  }
+
+               })
+               .catch(err => console.error(err))
+         }
+         const intervalId = setInterval(fetchFrame, 1000)
+         
+   
+      })();
+   </script>
+{% endblock content %}

@@ -1,0 +1,151 @@
+{% extends "boilerplate/base.html" %}
+{% block title %}Mahasiswa{% endblock %}
+{% block content %}
+{% include "partials/navbar_mahasiswa.html" %}
+   <div class="container px-1 text-white pb-2">
+      <div class="my-3 my-md-4 pt-1">
+         {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}   
+               {% for category, message in messages %}
+                  <div class="alert alert-{{category}} mb-3 alert-dismissible show fade" role="alert">
+                     <p class="mb-0 text-break">{{ message }}</p>
+                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+               {% endfor %}
+            {% endif %}
+         {% endwith %}
+         <div class="row mx-0">
+            <div class="col-lg-5 d-lg-flex justify-content-between mb-4 mb-lg-0">
+               <div class="w-100">
+                  <!-- <h5>Selamat {{aktivitas_terakhir[3]}}, {{user[2]}}</h5> -->
+                  <div class="border rounded p-3">
+                     {% if aktivitas_terakhir[0] %}
+                        <h6 class="mb-1">Aktivitas terakhir anda: </h6>
+                        <h4>{{aktivitas_terakhir[0]}}</h4>
+                        <h6 style="color: rgb(206, 206, 206);" class="mb-0">(teridentifikasi di {{aktivitas_terakhir[1]}}, {{aktivitas_terakhir[2]}})</h6>
+                     {% else %}
+                        <h6 class="mb-1">Aktivitas terakhir anda: </h6>
+                        <h4>-</h4>
+                        <h6 style="color: rgb(206, 206, 206);">(belum pernah teridentifikasi)</h6>
+                     {% endif %}
+                  </div>
+                  <div class="mt-4">
+                     <h5 class="mb-3 text-center text-md-start">Riwayat aktivitas</h5>
+                     <div class="w-100 overflow-x-auto">
+                        <table class="table" id="table_history_aktivitas">
+                           <thead>
+                              <tr>
+                                 <th scope="col">No.</th>
+                                 <th scope="col">Aktivitas</th>
+                                 <th scope="col">Ruangan</th>
+                                 <th scope="col">Tanggal</th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              {% for el in my_aktivitas %}
+                                 <tr data-url="{{el['url']}}">
+                                    <td></td>
+                                    <td>{{el["nama"]}}</td>
+                                    <td>
+                                       {{el["ruangan"]}}
+                                    </td>
+                                    <td>{{el["tanggal"]}}</td>
+                                 </tr>
+                              {% endfor %}
+                           </tbody>
+                        </table>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="col-lg-7">
+               <div class="border rounded p-3">
+                  <h5 class="text-center mb-4">Kalender aktivitas</h5>
+                  <div id='calendar'></div>
+                  <div class="d-lg-flex mt-3 small">
+                  <div class="me-3 mb-2">
+                     Keterangan:
+                  </div>
+                  <div class="me-3 mb-2 d-flex">
+                     <div class="keterangan_warna me-2" style="background-color: yellow;">
+                     </div>
+                     <div>
+                        Berada di Kampus
+                     </div>
+                  </div>
+                  <div class="mb-2 d-flex">
+                     <div class="keterangan_warna keterangan_warna_2 me-2" style="background-color: rgb(171, 4, 242);">
+                     </div>
+                     <div>
+                        Menghadiri Kegiatan
+                     </div>
+                  </div>
+                  </div>
+               </div>
+               <div class="border rounded p-3 mt-4">
+                  <p class="d-inline-block mb-0">Foto wajah yang didaftarkan</p>
+                  <button class="btn btn-secondary collapsible float-end"><i class="fas fa-chevron-down"></i></button>
+                  <div class="row collapsible-content mt-3">
+                     {% if not foto_wajah %}
+                        <i class="text-center mb-0">Segera daftarkan foto wajah anda <a href="/mahasiswa/akun">disini</a>.</i>
+                     {% else %}
+                        {% for el in foto_wajah %}
+                           <div class="col-3 col-lg-2">
+                              <img style="aspect-ratio: 1/1;" src="/{{el}}" alt="" class="w-100 mb-2 cursor-pointer" srcset="" data-bs-toggle="modal" data-bs-target="#open_{{loop.index0}}">
+                           </div>
+                           <div class="modal fade" id="open_{{loop.index0}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                              <div class="modal-dialog modal-md mx-auto my-4">
+                                 <div class="modal-content px-3 py-2 mx-auto">
+                                    <div class="modal-body d-flex flex-column">
+                                       <img style="aspect-ratio: 1/1;" src="/{{el}}" alt="" class="w-100 mb-2" srcset="">
+                                       <button type="button" class="btn btn-secondary px-2 py-1 shadow-sm h5 mb-0 mx-auto mt-2" data-bs-dismiss="modal">Tutup</button>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        {% endfor %}
+                     {% endif %}
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+   <script>
+      document.addEventListener('DOMContentLoaded', function() {
+         var calendarEl = document.getElementById('calendar');
+         const calendar = new FullCalendar.Calendar(calendarEl, {
+            locale: 'id',
+            buttonText: {
+               today: 'Hari ini' // ubah teks tombol "Today"
+            },
+            initialView: 'dayGridMonth',
+            eventDidMount: function(info) {
+               $(info.el).tooltip({ 
+               title: info.event.extendedProps.description,
+               placement: "bottom",
+               trigger: "hover"
+               });
+            },
+            events: [
+               {% for event in events %}
+                  {
+                     description: '{{event["description"]}}',
+                     start: '{{event["start"]}}',
+                     className: '{{event["className"]}}',
+                     url: '{{event["url"]}}'
+                  },
+               {% endfor %}
+            ],
+            displayEventTime: false
+         });
+         calendar.on('dateClick', function(info) {
+            console.log('clicked on ' + info.dateStr);
+         });
+         calendar.setOption('contentHeight', 50);
+         calendar.setOption('height', 500);
+         calendar.render();
+      });
+   </script>
+{% endblock content %}

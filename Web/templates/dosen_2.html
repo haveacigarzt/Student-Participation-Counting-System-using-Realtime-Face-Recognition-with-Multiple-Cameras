@@ -1,0 +1,134 @@
+{% extends "boilerplate/base.html" %}
+{% block title %}Dosen{% endblock %}
+{% block content %}
+{% include "partials/navbar_dosen.html" %}
+   <div class="container text-white my-4">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+         {% if messages %}   
+            {% for category, message in messages %}
+               <div class="alert alert-{{category}} mb-3 mx-0 alert-dismissible show fade" role="alert">
+                  <p class="mb-0 text-break">{{ message }}</p>
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+               </div>
+            {% endfor %}
+         {% endif %}
+      {% endwith %}
+      <div class="row mx-0 border border-1 border-white rounded">
+         <div class="pt-3 text-center">
+            <h5 class="display-link">Jadwal Kegiatan</h5>
+         </div>
+         <div class="p-4">
+            <div class="d-flex justify-content-between">
+               <div>
+                  <h4 id="that_day_element" class="mb-0"><a class="button-kuning" href="{{url_for('dosen')}}"><i class="fas fa-arrow-circle-left me-3"></i></a>{{hari_tgl[0]}}</h4>
+               </div>
+               {%if not hapus_tombol%}
+                  <div class="my-auto">
+                     <button data-bs-toggle="modal" data-bs-target="#modal_buat_jadwal" class="btn btn-light btn-sm shadow">Tambah Jadwal</button>
+                  </div>
+               {%endif%}
+            </div>
+            <div class="row mx-0 mt-3 border border-1 border-white rounded p-2 p-lg-3 p-md-0">
+               <div class="row m-0 equal-row px-0 px-lg-2" id="jadwal_card_container">
+               {% if jadwal_hari_ini %}
+                  {% for el in jadwal_hari_ini %}
+                     <div class="col-12 col-md-6 col-lg-4 col-xl-3 p-3">
+                        <div class="card-jadwal align-self-stretch bg-light rounded  {{ 'border-green' if el.resolved == 2}} {{'border-red' if el.resolved == 1 else 'border-blue' }}"><a href="/dosen/jadwal/{{el['_id']}}" class="d-block p-3 text-black text-decoration-none">
+                           <p class="mb-05">Ruangan: {{el["ruangan"]}} ({{el["kode_ruangan"]}})</p>
+                           <p class="mb-05">Kegiatan: {{el["nama_kegiatan"]}}</p>
+                           <p class="mb-05">Waktu: {{el["mulai_selesai_str"][0]}} - {{el["mulai_selesai_str"][1]}}</p>
+                           <p class="mb-05"><i class="fa-solid fa-user me-1"></i> {{el["id_dosen"]}}</p>
+                        </a></div>
+                     </div>
+                  {% endfor %}
+                  <div class="d-block d-md-flex ms-2 mt-1">
+                     <div class="me-3 mb-2">
+                        Keterangan:
+                     </div>
+                     <div class="me-3 mb-2 d-flex">
+                        <div class="keterangan_warna me-2" style="border: 4px solid rgb(25, 64, 255); background-color:white !important;">
+                        </div>
+                        <div>
+                           Belum dimulai
+                        </div>
+                     </div>
+                     <div class="me-3 mb-2 d-flex">
+                        <div class="keterangan_warna me-2" style="border: 4px solid red; background-color:white !important;">
+                        </div>
+                        <div>
+                           Sedang berlangsung
+                        </div>
+                     </div>
+                     <div class="mb-2 d-flex">
+                        <div class="keterangan_warna me-2" style="border: 4px solid rgb(43, 203, 43); background-color:white !important;">
+                        </div>
+                        <div>
+                           Sudah selesai
+                        </div>
+                     </div>
+                  </div>
+               {% else %}
+                  <div class="d-flex justify-content-center mt-3">
+                     <p>Tidak ditemukan jadwal kegiatan pada {{hari_tgl[2]}}</p>
+                  </div>
+               {% endif %}
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="modal fade" id="modal_buat_jadwal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-konfirmasi mx-auto my-4">
+         <div class="modal-content px-3 py-2 mx-auto">
+            <div class="modal-body">
+               <h5 class="mt-2 mb-0">Jadwal Kegiatan Baru</h5>
+               <div class="mb-4 pb-1 border-1 border-bottom border-black">
+                  <small><i>{{hari_tgl[0]}}</i></small>
+               </div>
+               <form action="{{url_for('dosen2')}}" method="post" class="mt-2">
+                  {{form_jadwal.hidden_tag()}}
+                  <div class="mb-3 row">
+                     <label for="ruangan_kegiatan" class="col-sm-3 col-form-label">Ruangan</label>
+                     <div class="col-sm-9">
+                        <select class="form-select" id="ruangan_kegiatan" name="ruangan_kegiatan" aria-label="Default select example" required onchange="ganti_ruangan(event)">
+                           {% for ruang in ruangan %}
+                              <option value="{{ruang['_id']}}___{{ruang['kode_ruangan']}} - {{ruang['nama_ruangan']}}">{{ruang['kode_ruangan']}} - {{ruang['nama_ruangan']}}</option>
+                           {% endfor %}
+                        </select>
+                     </div>
+                  </div>
+                  <div class="mb-3 row">
+                     <label for="nama_kegiatan" class="col-sm-3 col-form-label">Nama Kegiatan</label>
+                     <div class="col-sm-9">
+                        <input type="text" class="form-control" id="nama_kegiatan" name="nama_kegiatan" maxlength="20" required>
+                        <input type="hidden" name="tanggal" value="{{dt}}" required>
+                     </div>
+                  </div>
+                  <div class="mb-3 row">
+                     <label for="waktu_mulai" class="col-sm-3 col-form-label">Waktu Mulai</label>
+                     <div class="col-sm-9">
+                        <input type="time" class="form-control" id="waktu_mulai" name="waktu_mulai" required onchange="cek_waktu_selesai(event, true)">
+                     </div>
+                  </div>
+                  <div class="mb-3 row">
+                     <label for="waktu_selesai" class="col-sm-3 col-form-label">Waktu Selesai</label>
+                     <div class="col-sm-9">
+                        <input type="time" class="form-control" id="waktu_selesai" name="waktu_selesai" required onchange="cek_waktu_mulai(event, true)">
+                     </div>
+                  </div>
+                  <div class="mb-3 row">
+                     <label for="keterangan_kegiatan" class="col-sm-3 col-form-label">Keterangan</label>
+                     <div class="col-sm-9">
+                        <textarea class="form-control" name="keterangan_kegiatan" id="keterangan_kegiatan" maxlength="300" required cols="10" rows="3"></textarea>
+                     </div>
+                  </div>
+                  <div class="d-flex justify-content-evenly mt-4">
+                     <button type="button" class="btn  btn-secondary px-2 py-1 shadow-sm h5 mb-0" data-bs-dismiss="modal">Batal</button>
+                     {{form_jadwal.submit(class="btn btn-success btn-card px-2 py-1 shadow-sm h5 mb-0", id="button_submit")}}
+                  </div>
+               </form>
+            </div>
+         </div>
+      </div>
+   </div>
+{% endblock content %}

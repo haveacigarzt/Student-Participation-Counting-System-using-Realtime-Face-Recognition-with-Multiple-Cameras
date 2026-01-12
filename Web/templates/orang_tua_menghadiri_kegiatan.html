@@ -1,0 +1,57 @@
+{% extends "boilerplate/base.html" %}
+{% block title %}Orang Tua{% endblock %}
+{% block head_script %}
+{% endblock %}
+{% block content %}
+{% include "partials/navbar_orang_tua.html" %}
+   <div class="container text-white">
+      <div class="my-3 pt-1">
+         {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}   
+               {% for category, message in messages %}
+                  <div class="alert alert-{{category}} mb-3 mx-2 mx-lg-0 alert-dismissible show fade" role="alert">
+                     <p class="mb-0 text-break">{{ message }}</p>
+                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+               {% endfor %}
+            {% endif %}
+         {% endwith %}
+         <div class="row mx-0 px-1 px-lg-0">
+            <div class="border rounded pt-3">
+               <h5 class="text-center">{{nama_anak}} - Aktivitas Menghadiri Kegiatan</h5>
+               <h6 class="text-center">{{keterangan}}</h6>
+               <div class="d-flex pt-2">
+                  <div class="w-100 overflow-x-auto">
+                     <table class="table text-center" id="table_buffer">
+                        <thead>
+                           <tr>
+                              <th>Nama Kegiatan</th>
+                              <th>Tempat Teridentifikasi<br>(Ruangan)</th>
+                              <th>Waktu Terakhir<br>(H:MM:SS)</th>
+                              <th>Durasi Aktivitas<br>(H:MM:SS)</th>
+                           </tr>
+                        </thead>
+                        <tbody>
+                           {% for el in aktivitas %}
+                              <tr data-url="/orangtua/aktivitas/{{el['_id']}}">
+                                 <td>
+                                    {{el["nama_kegiatan"]}}
+                                 </td>
+                                 <td>
+                                    {{el["ruangan"]}}
+                                 </td>
+                                 <td>
+                                    {{el["waktu_terakhir"]}}
+                                 </td>
+                                 <td>{{el["durasi"]}}</td>
+                              </tr>
+                           {% endfor %}
+                        </tbody>
+                     </table>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+{% endblock content %}

@@ -1,0 +1,17 @@
+<html>
+<head>
+   {% block head %}
+   <title>{% block title %}{% endblock %} - Face Identification</title>
+   {% include "partials/links.html" %}
+   {% endblock %}
+   {% include "partials/scripts.html" %}
+   <link rel="icon" type="image/x-icon" href="/static/pictures/test.ico">
+   <meta content="width=device-width, initial-scale=1" name="viewport"/>
+</head>
+<body class="bg-dark darkmode-{{darkmode}}">
+   {% include "partials/spinner.html" %}
+   {% block content %}
+   {% endblock %}
+   {% include "partials/scripts_bottom.html" %}
+</body>
+</html>

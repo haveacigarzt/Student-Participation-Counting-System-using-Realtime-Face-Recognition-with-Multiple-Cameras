@@ -1,0 +1,167 @@
+{% extends "boilerplate/base.html" %}
+{% block title %}Profil Pengguna{% endblock %}
+{% block content %}
+{% if user[0] == "mahasiswa" %}
+{% include "partials/navbar_mahasiswa.html" %}
+{% elif user[0] == "dosen" %}
+{% include "partials/navbar_dosen.html" %}
+{% else %}
+{% include "partials/navbar_orang_tua.html" %}
+{% endif %}
+   <div class="container">
+      <div class="my-3 mx-auto card-profil">
+         {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}   
+               {% for category, message in messages %}
+                  <div class="alert alert-{{category}} my-3 alert-dismissible show fade" role="alert">
+                     <p class="mb-0 text-break">{{ message }}</p>
+                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+               {% endfor %}
+            {% endif %}
+         {% endwith %}
+         <h4 class="text-center">Profil</h4>
+         <div class="mx-0 d-flex flex-column rounded border shadow-sm p-3 text-white mt-2 justify-content-around">
+            <div class="d-flex d-md-none justify-content-center" id="foto_profil_div_up">
+               <img src="/{{profil['foto_profil']}}" width="150" class="cursor-pointer mb-2" alt="" srcset="" data-bs-toggle="modal" data-bs-target="#modal_profile_pic">
+            </div>
+            <div class="d-flex">
+               <div class="w-75" id="text_div_profil">
+                  <div class="row m-0">
+                     <div class="col-4">
+                        <p>Nama</p>
+                     </div>
+                     <div class="col-1 px-0 align-self-center">
+                        <p class="text-end">:</p>
+                     </div>
+                     <div class="col-7 align-self-center">
+                        {% if user[0] == "dosen" %}
+                           <p>
+                              <a href="/dosen/mahasiswa/{{profil['id']}}" class="url-aktivitas-mahasiswa">
+                                 {{profil["nama"]}}
+                              </a>
+                           </p>
+                        {% else %}
+                           <p>
+                              {{profil["nama"]}}
+                           </p>
+                        {% endif %}
+                     </div>
+                     <div class="col-4">
+                        <p>Username</p>
+                     </div>
+                     <div class="col-1 px-0 align-self-center">
+                        <p class="text-end">:</p>
+                     </div>
+                     <div class="col-7 align-self-center">
+                        <p>{{profil["username"]}}</p>
+                     </div>
+                     <div class="col-4">
+                        <p>Email</p>
+                     </div>
+                     <div class="col-1 px-0 align-self-center">
+                        <p class="text-end">:</p>
+                     </div>
+                     <div class="col-7 align-self-center">
+                        <p>{{profil["email"]}}</p>
+                     </div>
+                     <div class="col-4">
+                        <p>Jenis Pengguna</p>
+                     </div>
+                     <div class="col-1 px-0 align-self-center">
+                        <p class="text-end">:</p>
+                     </div>
+                     <div class="col-7 align-self-center">
+                        <p>{{profil["pengguna"]}}</p>
+                     </div>
+                     {% if profil["pengguna"] == "MAHASISWA" %}
+                        <div class="col-4">
+                           <p>NIM</p>
+                        </div>
+                        <div class="col-1 px-0 align-self-center">
+                           <p class="text-end">:</p>
+                        </div>
+                        <div class="col-7 align-self-center">
+                           <p>{{profil["nim"]}}</p>
+                        </div>
+                        <div class="col-4">
+                           <p>Akun Orang Tua</p>
+                        </div>
+                        <div class="col-1 px-0 align-self-center">
+                           <p class="text-end">:</p>
+                        </div>
+                        <div class="col-7 align-self-center">
+                           {% if profil["orang_tua"] %}
+                              <p>
+                                 <a href="/profil/orangtua/{{profil['id_orang_tua']}}">
+                                    {{profil["orang_tua"]}}
+                                 </a>
+                              </p>
+                           {% else %}
+                              <p>-</p>
+                           {% endif %}
+                        </div>
+                        <div class="col-4">
+                           <p>Aktivitas Terakhir</p>
+                        </div>
+                        <div class="col-1 px-0 align-self-center">
+                           <p class="text-end">:</p>
+                        </div>
+                        <div class="col-7 align-self-center">
+                           <p>
+                              {% if profil["aktivitas_terakhir"][0] %}
+                              {{profil["aktivitas_terakhir"][0]}} (teridentifikasi di {{profil["aktivitas_terakhir"][1]}}, {{profil["aktivitas_terakhir"][2]}})
+                              {% else %}
+                              - (belum pernah teridentifikasi)
+                              {% endif %}
+                           </p>
+                        </div>
+                     {% elif profil["pengguna"] == "DOSEN" %}
+                        <div class="col-4">
+                           <p>NIP</p>
+                        </div>
+                        <div class="col-1 px-0 align-self-center">
+                           <p class="text-end">:</p>
+                        </div>
+                        <div class="col-7 align-self-center">
+                           <p>
+                              {{profil["nip"]}}
+                           </p>
+                        </div>
+                     {% elif profil["pengguna"] == "ORANG TUA" %}
+                        <div class="col-4">
+                           <p>Akun Anak</p>
+                        </div>
+                        <div class="col-1 px-0 align-self-center">
+                           <p class="text-end">:</p>
+                        </div>
+                        <div class="col-7 align-self-center">
+                           <p>
+                              {% if profil['id_anak'] != "-" %}
+                                 <a class="d-inline-block bright-primary" href="/profil/mahasiswa/{{profil['id_anak']}}"> {{profil["anak"]}}</a>
+                              {% else %}
+                                 -
+                              {% endif %}
+                           </p>
+                        </div>
+                     {% endif %}
+                  </div>
+               </div>
+               <div class="w-25" id="foto_profil_div">
+                  <img src="/{{profil['foto_profil']}}" class="w-100 cursor-pointer" alt="" srcset="" data-bs-toggle="modal" data-bs-target="#modal_profile_pic">
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="modal fade" id="modal_profile_pic" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-konfirmasi mx-auto my-4">
+         <div class="modal-content p-2 mx-auto">
+            <div class="modal-body d-flex flex-column">
+               <img src="/{{profil['foto_profil']}}">
+               <button type="button" class="btn  btn-secondary px-2 py-1 shadow-sm h5 mb-0 mx-auto mt-2" data-bs-dismiss="modal">Tutup</button>
+            </div>
+         </div>
+      </div>
+   </div>
+{% endblock content %}

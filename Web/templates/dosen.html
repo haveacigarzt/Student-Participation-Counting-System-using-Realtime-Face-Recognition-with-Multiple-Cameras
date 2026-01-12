@@ -1,0 +1,125 @@
+{% extends "boilerplate/base.html" %}
+{% block title %}Dosen{% endblock %}
+{% block content %}
+{% include "partials/navbar_dosen.html" %}
+   <style>
+      .fc .fc-daygrid-day-frame {
+         height: 71px;
+      }
+   </style>
+   <div class="container my-3 pt-1">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+         {% if messages %}   
+            {% for category, message in messages %}
+               <div class="alert alert-{{category}} mb-3 mx-0 alert-dismissible show fade" role="alert">
+                  <p class="mb-0 text-break">{{ message }}</p>
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+               </div>
+            {% endfor %}
+         {% endif %}
+      {% endwith %}
+      <div class="row mx-0">
+         <div class="col-6 p-1 pt-3 active-display text-center">
+            <a class="display-link">Jadwal Kegiatan</a>
+         </div>
+         <div class="col-6 p-1 pt-3 non-active-display text-center">
+            <a class="display-link display-link-unactive d-block" href="{{url_for('dosen_berada_di_kampus')}}">Berada di Kampus</a>
+         </div>
+         <div class="display-inside half-a-border-on-top p-3 p-lg-4">
+            <div class="d-flex justify-content-end">
+               <button data-bs-toggle="modal" data-bs-target="#modal_buat_jadwal" class="btn btn-light shadow mb-3 mb-lg-0 btn-sm">Tambah Jadwal</button>
+            </div>
+            <div class="col-lg-6 mx-auto mb-4">
+               <div id='calendar' class="text-white"></div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="modal fade" id="modal_buat_jadwal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-konfirmasi mx-auto my-4">
+         <div class="modal-content px-3 py-2 mx-auto">
+            <div class="modal-body">
+               <h5 class="mb-4 mt-2 pb-1 border-1 border-bottom border-black">Jadwal Kegiatan Baru</h5>
+               <form action="{{url_for('dosen')}}" method="post" class="mt-2">
+                  {{form_jadwal.hidden_tag()}}
+                  <div class="mb-3 row">
+                     <label for="ruangan_kegiatan" class="col-sm-3 col-form-label">Ruangan</label>
+                     <div class="col-sm-9">
+                        <select class="form-select" id="ruangan_kegiatan" name="ruangan_kegiatan" aria-label="Default select example" required onchange="ganti_ruangan(event)">
+                           {% for ruang in ruangan %}
+                              <option value="{{ruang['_id']}}___{{ruang['kode_ruangan']}} - {{ruang['nama_ruangan']}}">
+                                 {{ruang['kode_ruangan']}} - {{ruang['nama_ruangan']}}
+                              </option>
+                           {% endfor %}
+                        </select>
+                     </div>
+                  </div>
+                  <div class="mb-3 row">
+                     <label for="nama_kegiatan" class="col-sm-3 col-form-label">Nama Kegiatan</label>
+                     <div class="col-sm-9">
+                        <input type="text" class="form-control" id="nama_kegiatan" name="nama_kegiatan" maxlength="20" required>
+                     </div>
+                  </div>
+                  <div class="mb-3 row">
+                     <label for="waktu_mulai" class="col-sm-3 col-form-label">Waktu Mulai</label>
+                     <div class="col-sm-9">
+                        <input type="datetime-local" class="form-control" id="waktu_mulai" name="waktu_mulai" required onchange="cek_waktu_selesai(event)">
+                     </div>
+                  </div>
+                  <div class="mb-3 row">
+                     <label for="waktu_selesai" class="col-sm-3 col-form-label">Waktu Selesai</label>
+                     <div class="col-sm-9">
+                        <input type="datetime-local" class="form-control" id="waktu_selesai" name="waktu_selesai" required onchange="cek_waktu_mulai(event)">
+                     </div>
+                  </div>
+                  <div class="mb-3 row">
+                     <label for="keterangan_kegiatan" class="col-sm-3 col-form-label">Keterangan</label>
+                     <div class="col-sm-9">
+                        <textarea class="form-control" name="keterangan_kegiatan" id="keterangan_kegiatan" maxlength="300" required cols="10" rows="3"></textarea>
+                     </div>
+                  </div>
+                  <div class="d-flex justify-content-evenly mt-4">
+                     <button type="button" class="btn  btn-secondary px-2 py-1 shadow-sm h5 mb-0" data-bs-dismiss="modal">Batal</button>
+                     {{form_jadwal.submit(class="btn btn-success btn-card px-2 py-1 shadow-sm h5 mb-0", id="button_submit")}}
+                  </div>
+               </form>
+            </div>
+         </div>
+      </div>
+   </div>
+   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+   <script>
+      document.addEventListener('DOMContentLoaded', function() {
+         var calendarEl = document.getElementById('calendar');
+         const calendar = new FullCalendar.Calendar(calendarEl, {
+            locale: 'id',
+            buttonText: {
+               today: 'Hari ini' // ubah teks tombol "Today"
+            },
+            initialView: 'dayGridMonth',
+            eventDidMount: function(info) {
+               $(info.el).tooltip({ 
+               title: info.event.extendedProps.description,
+               placement: "bottom",
+               trigger: "hover"
+               });
+            },
+            events: [
+               {% for event in semua_jadwal %}
+                  {
+                     description: 'Lihat jadwal pada tanggal ini',
+                     start: '{{event}}',
+                     className: 'event-white',
+                     url: '/dosen/jadwal?tanggal={{event}}'
+                  },
+               {% endfor %}
+            ],
+            displayEventTime: false
+         });
+         calendar.on('dateClick', function(info) {
+            console.log('clicked on ' + info.dateStr);
+         });
+         calendar.render();
+      });
+   </script>
+{% endblock content %}

@@ -1,0 +1,21 @@
+<nav class="bg-white" id="main_nav">
+   <a id="main_nav_brand" class="ms-lg-2" href="/mahasiswa">FaceID<span style="font-size: small;">Mahasiswa</span></a>
+   <div class="ms-auto align-items-center align-items-lg-start mt-2 mt-lg-0 me-lg-2">
+      <a href="#" class="nav-link dropdown-toggle p-1 px-2" data-bs-toggle="dropdown" data-value="daftar">
+         <img src="/{{user[3]}}" style="border-radius: 50%; object-fit:cover; width:37px; height:37px;" class="me-2 d-inline-block" alt="">
+         <span class="d-none d-lg-inline">
+            {{user[1]}}
+         </span>
+      </a>
+      <div class="dropdown-menu dropdown-menu-end mt-2 p-2 shadow">
+         <div class="form-check form-switch m-2">
+            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" {{darkmode}} oninput="ganti_mode(event)">
+            <label class="form-check-label" for="flexSwitchCheckChecked">Mode gelap</label>
+         </div>
+         <a href="{{url_for('mahasiswa_akun')}}" class="dropdown-item nav-link text-center mb-2 py-2">Akun</a>
+         <form action="{{url_for('logout')}}" method="post" class="mb-0">
+            <button type="submit" class="dropdown-item text-center mb-2 py-2 text-black">Logout</button>
+         </form>
+      </div>
+   </div>
+</nav>

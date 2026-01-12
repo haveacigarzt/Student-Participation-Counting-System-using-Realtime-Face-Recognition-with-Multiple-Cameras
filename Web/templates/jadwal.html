@@ -1,0 +1,97 @@
+{% extends "boilerplate/base.html" %}
+{% block title %}Dosen{% endblock %}
+{% block content %}
+{% include "partials/navbar_dosen.html" %}
+   <div class="container text-white">
+      <div class="my-4">
+         {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}   
+               {% for category, message in messages %}
+                  <div class="alert alert-{{category}} my-2 mx-0 my-lg-3 alert-dismissible show fade" role="alert">
+                     <p class="mb-0 text-break">{{ message }}</p>
+                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+               {% endfor %}
+            {% endif %}
+         {% endwith %}
+         <div class="row mx-0">
+            <div class="border rounded py-2 px-2 px-lg-5">
+               <h5 class="text-center mb-3">Detail Jadwal Kegiatan</h5>
+               <div class="d-flex p-2 border mb-2 mb-lg-4 py-lg-4 rounded row mx-2 mx-lg-0">
+                  <div class="col-lg-6 mb-4 mb-lg-0 mx-0">
+                     <div class="d-flex mb-2 mt-2 mt-lg-0">
+                        {% if editable %}
+                        <div class="editable_first">
+                           <h6 class="text-center ps-lg-5 ps-4 ps-md-2 ms-lg-4 ms-md-5 pt-2 pt-lg-1"><span class="title-jadwal-kegiatan" id="title_jadwal_kegiatan">Jadwal Kegiatan</span></h6>
+                        </div>
+                        <div class="editable_second" id="button_div">
+                           <button class="btn btn-warning shadow-sm m-1" onclick="gantiInput3({{jadwal}}, {{ruangan}})" title="Ubah Jadwal"><i class="fa-solid fa-pen-to-square"></i></button>
+                        </div>
+                        {% else %}
+                        <div class="w-100">
+                           <h6 class="text-center"><span class="title-jadwal-kegiatan" id="title_jadwal_kegiatan">Jadwal Kegiatan</span></h6>
+                        </div>
+                        {% endif %}
+                     </div>
+                     <div class="row mx-lg-2 pe-1 pe-lg-0" id="form_div">
+                        <div class="col-5 col-lg-4 form-div-top-left">Kegiatan</div>
+                        <div class="col-7 col-lg-8 form-div-top-right" style="overflow-wrap: break-word;">{{jadwal["nama_kegiatan"]}}</div>
+                        <div class="col-5 col-lg-4 form-div-mid-left">Ruangan</div>
+                        <div class="col-7 col-lg-8 form-div-mid-right">{{jadwal["ruangan"]}}</div>
+                        <div class="col-5 col-lg-4 form-div-mid-left">Tanggal</div>
+                        <div class="col-7 col-lg-8 form-div-mid-right">{{jadwal["tanggal"]}}</div>
+                        <div class="col-5 col-lg-4 form-div-mid-left">Waktu Mulai</div>
+                        <div class="col-7 col-lg-8 form-div-mid-right">{{jadwal["mulai"]}} WIB</div>
+                        <div class="col-5 col-lg-4 form-div-mid-left">Waktu Selesai</div>
+                        <div class="col-7 col-lg-8 form-div-mid-right">{{jadwal["selesai"]}} WIB</div>
+                        <div class="col-5 col-lg-4 form-div-mid-left">Durasi Kegiatan</div>
+                        <div class="col-7 col-lg-8 form-div-mid-right">{{jadwal["durasi"]}} <span title="J: Jam, M: Menit, D: Detik">(J:MM:DD)</span></div>
+                        <div class="col-5 col-lg-4 form-div-mid-left">Keterangan</div>
+                        <div class="col-7 col-lg-8 form-div-mid-right" style="overflow-wrap: break-word;">{{jadwal["keterangan"]}}</div>
+                        <div class="col-5 col-lg-4 form-div-mid-left">Pembuat Jadwal</div>
+                        <div class="col-7 col-lg-8 form-div-mid-right">
+                           <a href="/profil/dosen/{{jadwal['dosen_id']}}" class="link-pembuat-jadwal" onmouseenter="active_link_pembuat_jadwal(event)" onmouseleave="deactive_link_pembuat_jadwal(event)">
+                              <img src="/{{jadwal['foto_profil_path']}}" style="border-radius: 50%; object-fit:cover; width:30px; height:30px; margin-right: 2px;" alt="">
+                              <span>
+                                 {{jadwal["nama_dosen"]}}
+                              </span>
+                           </a>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="col-lg-6">
+                     <h6 class="text-center mb-2 mb-lg-3"><span class="title-jadwal-kegiatan">Jumlah mahasiswa teridentifikasi : {{hasil|length}} orang</span></h6>
+                     <div class="px-0 w-100 overflow-x-auto">
+                        <table class="table" id="table_dosen_jadwal">
+                           <thead>
+                              <tr>
+                                 <th>No</th>
+                                 <th>Nama</th>
+                                 <th>NIM</th>
+                                 <th>Durasi<br> <span title="J: Jam, M: Menit, D: Detik">(J:MM:DD)</span></th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              {% for el in hasil %}
+                                 <tr data-url="{{el['href']}}">
+                                    <td></td>
+                                    <td>
+                                       <img src="/{{el['foto_profil']}}" width="35" style="border-radius: 50%; object-fit:cover; width:30px; height:30px; margin-right: 2px;" alt="">
+                                       {{el["nama"]}}
+                                    </td>
+                                    <td>{{el["nim"]}}</td>
+                                    <td>{{el["durasi"]}}</td>
+                                 </tr>
+                              {% endfor %}
+                           </tbody>
+                        </table>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <script>
+   </script>
+{% endblock content %}

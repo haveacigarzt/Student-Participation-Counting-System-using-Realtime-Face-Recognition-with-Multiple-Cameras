@@ -1,0 +1,51 @@
+{% extends "boilerplate/base.html" %}
+{% block title %}Dosen{% endblock %}
+{% block content %}
+{% include "partials/navbar_dosen.html" %}
+   <div class="container text-white my-3 pt-1">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+         {% if messages %}   
+            {% for category, message in messages %}
+               <div class="alert alert-{{category}} mb-3 mx-0 alert-dismissible show fade" role="alert">
+                  <p class="mb-0 text-break">{{ message }}</p>
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+               </div>
+            {% endfor %}
+         {% endif %}
+      {% endwith %}
+      <div class="row mx-0 rounded border p-3">
+         <h4 class="text-center">Aktivitas Terakhir Mahasiswa</h4>
+         <div class="px-0 w-100 overflow-x-auto">
+            <table id="table_dosen_mahasiswa" class="table table-bordered display nowrap p-3 rounded bg-white shadow-sm border w-100">
+               <thead>
+                  <tr>
+                     <th scope="col">No.</th>
+                     <th scope="col">Nama</th>
+                     <th scope="col">NIM</th>
+                     <th scope="col">Aktivitas Terakhir</th>
+                     <th scope="col">Tempat Teridentifikasi<br>(Ruangan)</th>
+                     <th scope="col">Tanggal<br>(DD/mm/YYYY)</th>
+                     <th scope="col">Waktu<br>(HH:MM:SS)</th>
+                  </tr>
+               </thead>
+               <tbody id="table_berada_di_kampus_tbody">
+                  {% for el in mahasiswa %}
+                     <tr>
+                        <td class="mypt"></td>
+                        <td class="mypt mytd" data-url="/dosen/mahasiswa/{{el['id_mhs']}}">
+                           <img src="/{{el['foto_profil']}}" style="border-radius: 50%; object-fit:cover; width:30px; height:30px; margin-right: 2px;" alt="">
+                           {{el["nama"]}}
+                        </td>
+                        <td class="mypt">{{el["nim"]}}</td>
+                        <td class="mypt">{{el["aktivitas"]}}</td>
+                        <td class="mypt">{{el["tempat"]}}</td>
+                        <td class="mypt">{{el["tanggal"]}}</td>
+                        <td class="mypt">{{el["waktu"]}}</td>
+                     </tr>
+                  {% endfor %}
+               </tbody>
+            </table>
+         </div>
+      </div>
+   </div>
+{% endblock content %}

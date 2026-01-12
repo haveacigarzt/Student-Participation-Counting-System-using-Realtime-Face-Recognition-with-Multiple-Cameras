@@ -1,0 +1,50 @@
+{% extends "boilerplate/base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+{% include "partials/navbar.html" %}
+   <div class="container">
+      <div class="p-2 mt-3 p-md-4 mx-auto" id="login_box">
+         {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}   
+               {% for category, message in messages %}
+                  <div class="alert alert-{{category}} mb-3 mx-0 alert-dismissible show fade" role="alert">
+                     <span>{{ message }}</span>
+                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
+               {% endfor %}
+            {% endif %}
+         {% endwith %}
+         <form method="post" action="{{ url_for('login') }}" class="p-3 rounded shadow-sm bg-white">
+            {{ form.hidden_tag() }}
+            <h4 class="card-title mb-3">Login</h4>
+            <div class="mb-3">
+               {{ form.username.label(class='form-label mb-0') }}  {{ form.username(class='form-control') }}
+            </div>
+            <div class="mb-3">
+               {{ form.password.label(class='form-label mb-0') }}
+               <div class="input-group">
+                  {{ form.password(class='form-control') }}
+                  <button type="button" class="btn btn-outline-secondary" onclick="reveal_pass_btn(event.target)">
+                     <i class="fa-solid fa-eye-slash"></i>
+                  </button>
+               </div>
+            </div>
+            <p class="mb-1">Login sebagai?</p>
+            <div class="d-flex justify-content-evenly mb-3 border rounded p-2">
+               {% for subfield in form.pengguna %}
+                <div class="form-check">
+                  {{ subfield(class="form-check-input") }}
+                  {{ subfield.label(class="form-check-label") }}
+                </div>
+               {% endfor %}
+            </div>
+            <div class="d-flex flex-column align-items-center mt-4">
+               {{ form.masuk(class='btn btn-primary align-self-center shadow-sm mb-4') }}
+               <p>Belum punya akun? <a href="#" onclick="open_daftar_dropdown()">Daftar</a></p>
+            </div>
+         </form>
+      </div>
+   </div>
+{% endblock content %}
+{% block script %}
+{% endblock script %}
