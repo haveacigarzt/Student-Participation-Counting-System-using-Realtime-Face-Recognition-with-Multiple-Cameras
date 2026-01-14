@@ -1,2 +1,2 @@
 # Student Participation Counting System using Real-time Face Recognition with Multiple Cameras
-A Python computer vision–based system (including desktop (windows) &amp; web) designed to automatically measure student participation in a learning environment. The system utilizes real-time face recognition to identify students and track their presence and activity across multiple camera sources simultaneously.
+A Python computer vision–based system (including desktop &amp; web) designed to automatically measure student participation in a learning environment. The system utilizes real-time face recognition to identify students and track their presence and activity across multiple camera sources simultaneously.
